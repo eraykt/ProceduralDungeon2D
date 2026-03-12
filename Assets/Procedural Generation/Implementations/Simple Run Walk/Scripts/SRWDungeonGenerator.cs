@@ -7,27 +7,27 @@ namespace ProcGen
 {
     public class SRWDungeonGenerator : DungeonGeneratorBase
     {
-        [SerializeField] private SRWSettings _settings;
+        [SerializeField] protected SRWSettings _settings;
 
         protected override void RunProceduralGeneration()
         {
-            HashSet<Vector2Int> floorPositions = RunRandomWalk();
+            HashSet<Vector2Int> floorPositions = RunRandomWalk(_settings, _startPosition);
 
             _tilemapVisualizer.PaintFloorTiles(floorPositions);
             WallGenerator.CreateWalls(floorPositions, _tilemapVisualizer);
         }
 
-        private HashSet<Vector2Int> RunRandomWalk()
+        protected HashSet<Vector2Int> RunRandomWalk(SRWSettings settings, Vector2Int position)
         {
             HashSet<Vector2Int> floorPositions = new();
-            Vector2Int currentPosition = _startPosition;
+            Vector2Int currentPosition = position;
 
-            for (int i = 0; i < _settings.iterations; i++)
+            for (int i = 0; i < settings.iterations; i++)
             {
-                var path = ProceduralGenerationAlgorithms.SimpleRandomWalk(currentPosition, _settings.walkLength);
+                var path = ProceduralGenerationAlgorithms.SimpleRandomWalk(currentPosition, settings.walkLength);
                 floorPositions.UnionWith(path);
 
-                if (_settings.startRandomStartingPositionEachIteration)
+                if (settings.startRandomStartingPositionEachIteration)
                 {
                     currentPosition = floorPositions.ElementAt(Random.Range(0, floorPositions.Count));
                 }
